@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.InputSystem;
 using UnityEngine.EventSystems;
@@ -24,6 +24,13 @@ public class ButterflyCatcher : MonoBehaviour
     [SerializeField] private InventoryManager _inventory;
 
     [SerializeField] private ButterflySpawner _butterflySpawner;
+    
+    [Header("Capture Feedback")]
+    [SerializeField] private GameObject _captureParticlesPrefab;
+    [SerializeField] private AudioClip _captureSound;
+    [SerializeField] private AudioClip _attemptSound;
+
+    private AudioSource _audioSource;
 
     private void Awake()
     {
@@ -32,6 +39,12 @@ public class ButterflyCatcher : MonoBehaviour
         int screenHeight = Screen.height;
 
         _parentTransform.localPosition = new Vector3(-screenWidth/2, -screenHeight/2, 0);
+
+        _audioSource = GetComponent<AudioSource>();
+        if (_audioSource == null)
+        {
+            _audioSource = gameObject.AddComponent<AudioSource>();
+        }
     }
 
     private void Update()
@@ -107,9 +120,14 @@ public class ButterflyCatcher : MonoBehaviour
 
     private void TryCatchButterfly(Vector3 catcherLocalPosition, float catcherRadius)
     {
+        if (_attemptSound != null)
+        {
+            _audioSource.PlayOneShot(_attemptSound);
+        }
+
         if (catcherRadius <= 0)
         {
-            Debug.LogWarning("El círculo dibujado no tiene un radio válido.");
+            Debug.LogWarning("El cï¿½rculo dibujado no tiene un radio vï¿½lido.");
             return;
         }
 
@@ -124,7 +142,7 @@ public class ButterflyCatcher : MonoBehaviour
 
             // verificar si esta davant de la camera
             if (screenPos.z < 0.1f)
-                continue; // està darrere
+                continue; // estï¿½ darrere
 
             Vector2 butterflyScreenPos = new Vector2(screenPos.x, screenPos.y);
 
@@ -157,6 +175,18 @@ public class ButterflyCatcher : MonoBehaviour
 
     private void CatchButterfly(ButterflyInteractable butterfly)
     {
+        Vector3 capturePosition = butterfly.transform.position;
+
+        if (_captureParticlesPrefab != null)
+        {
+            Instantiate(_captureParticlesPrefab, capturePosition, Quaternion.identity);
+        }
+
+        if (_captureSound != null)
+        {
+            _audioSource.PlayOneShot(_captureSound);
+        }
+
         ButterflyData catchedButterfly = butterfly.Catch();
         _inventory.AddNewButterfly(catchedButterfly);
     }

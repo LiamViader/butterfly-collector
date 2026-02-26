@@ -17,6 +17,12 @@ public class FeaturePointsManager : MonoBehaviour
 {
     [SerializeField] private GameObject debugSpherePrefab;
 
+    [SerializeField] private GameObject _scanTextObject;
+
+    [SerializeField] private int _pointsHighThreshold = 20;
+    [SerializeField] private int _pointsLowThreshold = 5;
+    private bool _uiHidden = false;
+
     // Lista temporal para mantener referencias a las esferas creadas
     private List<GameObject> _debugSpheres = new List<GameObject>();
 
@@ -85,6 +91,17 @@ public class FeaturePointsManager : MonoBehaviour
                 );
                 _debugSpheres.Add(sphere);
             }
+        }
+
+        if (!_uiHidden && _featurePoints.Count >= _pointsHighThreshold)
+        {
+            _scanTextObject.SetActive(false);
+            _uiHidden = true;
+        }
+        else if (_uiHidden && _featurePoints.Count < _pointsLowThreshold)
+        {
+            _scanTextObject.SetActive(true);
+            _uiHidden = false;
         }
     }
 
