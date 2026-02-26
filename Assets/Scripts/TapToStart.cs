@@ -1,16 +1,19 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.InputSystem;
 
 public class TapToStart : MonoBehaviour
 {
     void Update()
     {
-
-        if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)
+        if (Touchscreen.current != null && Touchscreen.current.primaryTouch.press.wasPressedThisFrame)
         {
             ChangeScene();
         }
-
+        else if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
+        {
+            ChangeScene();
+        }
     }
 
     void ChangeScene()
